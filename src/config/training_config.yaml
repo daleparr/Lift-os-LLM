@@ -1,0 +1,247 @@
+# Training Configuration for LLM Finance Leaderboard
+# Enhanced with G-SIB Banking Corpus
+
+# Dataset Configuration
+datasets:
+  basic_finance:
+    path: "data/training/synthetic_finance_v2.jsonl"
+    type: "instruction_following"
+    domain: "general_finance"
+    complexity: "low_medium"
+    samples: 20
+    weight: 0.4
+    
+  gsib_banking:
+    path: "data/training/synthetic_finance_gsib_v3.jsonl"
+    type: "instruction_following"
+    domain: "gsib_banking"
+    complexity: "high"
+    samples: 30
+    weight: 0.6
+    
+  combined_corpus:
+    path: "data/training/combined_finance_corpus.jsonl"
+    type: "instruction_following"
+    domain: "comprehensive_finance"
+    complexity: "mixed"
+    samples: 50
+    weight: 1.0
+
+# Training Parameters
+training:
+  # Model Configuration
+  base_models:
+    - "mistralai/Mistral-7B-Instruct-v0.1"
+    - "meta-llama/Llama-2-7b-chat-hf"
+    - "Qwen/Qwen1.5-7B-Chat"
+  
+  # LoRA Configuration
+  lora:
+    rank: 16
+    alpha: 32
+    dropout: 0.1
+    target_modules: ["q_proj", "v_proj", "k_proj", "o_proj"]
+    bias: "none"
+    task_type: "CAUSAL_LM"
+  
+  # Training Hyperparameters
+  hyperparameters:
+    learning_rate: 2e-5
+    batch_size: 4
+    gradient_accumulation_steps: 4
+    num_epochs: 3
+    warmup_steps: 100
+    weight_decay: 0.01
+    max_grad_norm: 1.0
+    
+  # Optimization
+  optimizer:
+    type: "adamw"
+    betas: [0.9, 0.999]
+    eps: 1e-8
+    
+  # Scheduler
+  scheduler:
+    type: "cosine"
+    num_cycles: 0.5
+    
+  # Quantization (for memory efficiency)
+  quantization:
+    load_in_4bit: true
+    bnb_4bit_compute_dtype: "float16"
+    bnb_4bit_quant_type: "nf4"
+    bnb_4bit_use_double_quant: true
+
+# Evaluation Configuration
+evaluation:
+  # Validation Split
+  validation_split: 0.2
+  
+  # Metrics
+  metrics:
+    - "exact_match"
+    - "rouge_l"
+    - "bleu"
+    - "financial_accuracy"
+    - "regulatory_compliance"
+    
+  # Domain-Specific Evaluation
+  domain_metrics:
+    calculation_accuracy:
+      weight: 0.3
+      tolerance: 0.01  # 1% tolerance for numerical calculations
+      
+    regulatory_knowledge:
+      weight: 0.25
+      categories: ["basel_iii", "liquidity", "capital", "risk_management"]
+      
+    explanation_quality:
+      weight: 0.25
+      criteria: ["clarity", "completeness", "accuracy"]
+      
+    practical_application:
+      weight: 0.2
+      scenarios: ["compliance_assessment", "risk_analysis", "capital_planning"]
+
+# Hardware Requirements
+hardware:
+  # Minimum Requirements
+  min_gpu_memory: 16  # GB
+  min_system_memory: 32  # GB
+  recommended_gpu: "RTX 4090"
+  
+  # Training Optimization
+  mixed_precision: true
+  gradient_checkpointing: true
+  dataloader_num_workers: 4
+  pin_memory: true
+
+# Monitoring and Logging
+monitoring:
+  # Weights & Biases
+  wandb:
+    project: "llm-finance-leaderboard"
+    entity: "gsib-training"
+    tags: ["gsib", "basel-iii", "regulatory", "fine-tuning"]
+    
+  # Logging Configuration
+  logging:
+    level: "INFO"
+    log_interval: 10  # steps
+    eval_interval: 100  # steps
+    save_interval: 500  # steps
+    
+  # Checkpointing
+  checkpointing:
+    save_total_limit: 3
+    save_strategy: "steps"
+    save_steps: 500
+    load_best_model_at_end: true
+    metric_for_best_model: "eval_financial_accuracy"
+
+# Data Processing
+data_processing:
+  # Tokenization
+  max_length: 2048
+  truncation: true
+  padding: "max_length"
+  
+  # Data Augmentation
+  augmentation:
+    enabled: false  # Disabled for regulatory accuracy
+    techniques: []
+    
+  # Preprocessing
+  preprocessing:
+    remove_duplicates: true
+    validate_format: true
+    check_numerical_accuracy: true
+    
+# Quality Assurance
+quality_assurance:
+  # Validation Checks
+  pre_training:
+    - "dataset_format_validation"
+    - "numerical_accuracy_check"
+    - "regulatory_compliance_review"
+    - "duplicate_detection"
+    
+  during_training:
+    - "loss_monitoring"
+    - "gradient_norm_tracking"
+    - "memory_usage_monitoring"
+    - "learning_rate_scheduling"
+    
+  post_training:
+    - "model_performance_evaluation"
+    - "regulatory_knowledge_assessment"
+    - "calculation_accuracy_testing"
+    - "bias_detection"
+
+# Experiment Configuration
+experiments:
+  # Baseline Experiments
+  baseline:
+    name: "baseline_general_finance"
+    dataset: "basic_finance"
+    description: "Training on general financial concepts only"
+    
+  # G-SIB Specialized
+  gsib_specialized:
+    name: "gsib_banking_specialist"
+    dataset: "gsib_banking"
+    description: "Training exclusively on G-SIB banking concepts"
+    
+  # Combined Training
+  comprehensive:
+    name: "comprehensive_finance"
+    dataset: "combined_corpus"
+    description: "Training on combined general and G-SIB corpus"
+    
+  # Curriculum Learning
+  curriculum:
+    name: "curriculum_learning"
+    stages:
+      - dataset: "basic_finance"
+        epochs: 2
+        learning_rate: 3e-5
+      - dataset: "gsib_banking"
+        epochs: 3
+        learning_rate: 2e-5
+    description: "Progressive training from basic to advanced concepts"
+
+# Output Configuration
+output:
+  # Model Artifacts
+  model_output_dir: "models/fine_tuned"
+  checkpoint_dir: "models/checkpoints"
+  logs_dir: "logs/training"
+  
+  # Evaluation Results
+  results_dir: "results/training"
+  metrics_file: "training_metrics.json"
+  comparison_report: "model_comparison_report.md"
+  
+  # Model Export
+  export_formats: ["pytorch", "onnx", "huggingface"]
+  push_to_hub: false
+  hub_model_id: "llm-finance-leaderboard/gsib-specialist"
+
+# Regulatory Compliance
+compliance:
+  # Data Governance
+  data_lineage: true
+  audit_trail: true
+  version_control: true
+  
+  # Model Governance
+  model_documentation: true
+  performance_monitoring: true
+  bias_testing: true
+  explainability: true
+  
+  # Risk Management
+  model_risk_assessment: true
+  validation_framework: true
+  ongoing_monitoring: true
+  regulatory_reporting: true

@@ -1,0 +1,155 @@
+# Model Configuration for LLM Finance Leaderboard
+
+stock_models:
+  mistral_7b:
+    name: "mistralai/Mistral-7B-Instruct-v0.1"
+    display_name: "Mistral 7B Instruct"
+    parameters: "7B"
+    quantization: null
+    context_length: 8192
+    cost_per_1k_tokens: 0.0002
+    provider: "huggingface"
+    
+  llama2_13b:
+    name: "meta-llama/Llama-2-13b-chat-hf"
+    display_name: "Llama 2 13B Chat"
+    parameters: "13B"
+    quantization: null
+    context_length: 4096
+    cost_per_1k_tokens: 0.0004
+    provider: "huggingface"
+    
+  falcon_40b:
+    name: "tiiuae/falcon-40b-instruct"
+    display_name: "Falcon 40B Instruct"
+    parameters: "40B"
+    quantization: "4bit"
+    context_length: 2048
+    cost_per_1k_tokens: 0.0008
+    provider: "huggingface"
+    
+  qwen_7b:
+    name: "Qwen/Qwen1.5-7B-Chat"
+    display_name: "Qwen 1.5 7B Chat"
+    parameters: "7B"
+    quantization: null
+    context_length: 32768
+    cost_per_1k_tokens: 0.0002
+    provider: "huggingface"
+    
+  phi3_mini:
+    name: "microsoft/Phi-3-mini-128k-instruct"
+    display_name: "Phi-3 Mini 128K"
+    parameters: "3.8B"
+    quantization: null
+    context_length: 128000
+    cost_per_1k_tokens: 0.0001
+    provider: "huggingface"
+    
+  gpt35_turbo:
+    name: "gpt-3.5-turbo-1106"
+    display_name: "GPT-3.5 Turbo"
+    parameters: "20B"
+    quantization: null
+    context_length: 16385
+    cost_per_1k_tokens: 0.001
+    provider: "openai"
+
+finance_tuned_models:
+  finma_7b:
+    name: "FinMA-7B"
+    display_name: "FinMA 7B"
+    parameters: "7B"
+    quantization: null
+    context_length: 8192
+    cost_per_1k_tokens: 0.0002
+    provider: "huggingface"
+    base_model: "mistralai/Mistral-7B-Instruct-v0.1"
+    
+  fingpt_llama2_13b:
+    name: "FinGPT/lora-llama2-13b-sentiment"
+    display_name: "FinGPT Llama2 13B Sentiment"
+    parameters: "13B"
+    quantization: null
+    context_length: 4096
+    cost_per_1k_tokens: 0.0004
+    provider: "huggingface"
+    base_model: "meta-llama/Llama-2-13b-chat-hf"
+    
+  custom_mistral_finance:
+    name: "custom-mistral-finance-lora"
+    display_name: "Custom Mistral Finance LoRA"
+    parameters: "7B"
+    quantization: null
+    context_length: 8192
+    cost_per_1k_tokens: 0.0002
+    provider: "local"
+    base_model: "mistralai/Mistral-7B-Instruct-v0.1"
+    lora_path: "models/custom_lora/mistral_finance"
+
+# Default model parameters
+default_parameters:
+  temperature: 0.1
+  top_p: 0.9
+  max_tokens: 2048
+  frequency_penalty: 0.0
+  presence_penalty: 0.0
+  stop_sequences: []
+
+# Hardware requirements
+hardware_requirements:
+  gpu_memory_gb:
+    "3.8B": 8
+    "7B": 16
+    "13B": 24
+    "20B": 32
+    "40B": 80
+  
+  recommended_gpu:
+    "3.8B": "RTX 4060 Ti"
+    "7B": "RTX 4090"
+    "13B": "A10G"
+    "20B": "A100 40GB"
+    "40B": "A100 80GB"
+
+# Evaluation settings per model type
+evaluation_settings:
+  batch_size:
+    "3.8B": 8
+    "7B": 4
+    "13B": 2
+    "20B": 1
+    "40B": 1
+  
+  timeout_minutes:
+    "3.8B": 15
+    "7B": 20
+    "13B": 30
+    "20B": 45
+    "40B": 60
+
+# Model-specific prompt templates
+prompt_templates:
+  mistral:
+    system_prefix: "<s>[INST] "
+    system_suffix: " [/INST]"
+    user_prefix: ""
+    user_suffix: ""
+    assistant_prefix: ""
+    assistant_suffix: "</s>"
+    
+  llama2:
+    system_prefix: "<s>[INST] <<SYS>>\n"
+    system_suffix: "\n<</SYS>>\n\n"
+    user_prefix: ""
+    user_suffix: " [/INST] "
+    assistant_prefix: ""
+    assistant_suffix: " </s><s>[INST] "
+    
+  default:
+    system_prefix: "System: "
+    system_suffix: "\n\n"
+    user_prefix: "Human: "
+    user_suffix: "\n\n"
+    assistant_prefix: "Assistant: "
+    assistant_suffix: "\n\n"

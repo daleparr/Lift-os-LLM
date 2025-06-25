@@ -1,0 +1,178 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm-finance-leaderboard"
+version = "0.1.0"
+description = "Reproducible benchmark harness for evaluating LLMs on financial analysis tasks"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "Your Organization", email = "contact@yourorg.com"}
+]
+keywords = ["llm", "finance", "benchmark", "leaderboard", "evaluation"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Financial and Insurance Industry",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Office/Business :: Financial",
+]
+
+dependencies = [
+    "streamlit>=1.28.0",
+    "fastapi>=0.104.0",
+    "pydantic>=2.5.0",
+    "pandas>=2.1.0",
+    "numpy>=1.24.0",
+    "torch>=2.1.0",
+    "transformers>=4.35.0",
+    "sentence-transformers>=2.2.2",
+    "pinecone-client>=2.2.4",
+    "sqlalchemy>=2.0.0",
+    "python-dotenv>=1.0.0",
+    "requests>=2.31.0",
+    "plotly>=5.17.0",
+    "loguru>=0.7.2",
+    "pyyaml>=6.0.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.9.0",
+    "isort>=5.12.0",
+    "flake8>=6.1.0",
+    "mypy>=1.6.0",
+]
+
+financial-data = [
+    "yfinance>=0.2.18",
+    "fredapi>=0.5.1",
+    "sec-edgar-downloader>=5.0.0",
+]
+
+agents = [
+    "langchain>=0.1.0",
+    "langgraph>=0.0.60",
+    "langchain-community>=0.0.20",
+    "langchain-openai>=0.0.5",
+    "langchain-anthropic>=0.1.0",
+]
+
+monitoring = [
+    "wandb>=0.16.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/your-org/llm-finance-leaderboard"
+Repository = "https://github.com/your-org/llm-finance-leaderboard"
+Documentation = "https://github.com/your-org/llm-finance-leaderboard/docs"
+"Bug Tracker" = "https://github.com/your-org/llm-finance-leaderboard/issues"
+
+[project.scripts]
+finance-leaderboard = "src.cli:main"
+run-benchmark = "scripts.run_benchmark:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*", "streamlit_app*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["src", "streamlit_app"]
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "pinecone.*",
+    "wandb.*",
+    "yfinance.*",
+    "fredapi.*",
+    "sec_edgar_downloader.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=src",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__init__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]

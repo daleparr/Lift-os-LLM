@@ -1,0 +1,125 @@
+# Benchmark Configuration for LLM Finance Leaderboard
+
+# Evaluation Settings
+evaluation:
+  seeds: [42, 123, 456]
+  temperature: 0.1
+  top_p: 0.9
+  max_tokens: 2048
+  timeout_minutes: 30
+  max_concurrent_evaluations: 3
+  
+# Scoring Configuration
+scoring:
+  weights:
+    quality: 0.9
+    efficiency: 0.1
+  
+  quality_breakdown:
+    low_complexity: 0.3
+    medium_complexity: 0.4
+    high_complexity: 0.3
+  
+  metrics:
+    low_complexity:
+      - exact_match_f1
+      - token_overlap
+    medium_complexity:
+      - rouge_1
+      - rouge_2
+      - fact_score
+    high_complexity:
+      - human_rating
+      - mape_vs_consensus
+      - pairwise_preference
+
+# Hardware Requirements
+hardware:
+  gpu_type: "A10"
+  memory_gb: 16
+  timeout_minutes: 30
+  
+# Task Configuration
+tasks:
+  low_complexity:
+    weight: 0.3
+    timeout_minutes: 5
+    max_retries: 2
+    
+  medium_complexity:
+    weight: 0.4
+    timeout_minutes: 10
+    max_retries: 2
+    
+  high_complexity:
+    weight: 0.3
+    timeout_minutes: 20
+    max_retries: 1
+
+# Data Sources
+data_sources:
+  sec_filings:
+    enabled: true
+    update_frequency: "quarterly"
+    retention_years: 5
+    
+  earnings_transcripts:
+    enabled: true
+    update_frequency: "quarterly"
+    retention_years: 3
+    
+  market_data:
+    enabled: true
+    update_frequency: "daily"
+    retention_years: 10
+    
+  news_data:
+    enabled: true
+    update_frequency: "daily"
+    retention_days: 365
+
+# G-SIB Banks Configuration
+gsib_banks:
+  primary_focus:
+    - JPM  # JPMorgan Chase
+    - BAC  # Bank of America
+    - WFC  # Wells Fargo
+    - C    # Citigroup
+    - GS   # Goldman Sachs
+    - MS   # Morgan Stanley
+  
+  secondary_focus:
+    - USB  # U.S. Bancorp
+    - PNC  # PNC Financial
+    - TD   # Toronto-Dominion
+    - RY   # Royal Bank of Canada
+
+# Reproducibility Settings
+reproducibility:
+  deterministic_seeds: true
+  frozen_prompts: true
+  identical_retrieval: true
+  version_controlled_configs: true
+  immutable_logs: true
+
+# Fairness Safeguards
+fairness:
+  prompt_transparency: true
+  automated_execution: true
+  model_agnostic_preprocessing: true
+  double_blind_human_eval: true
+  statistical_significance_testing: true
+
+# Output Configuration
+output:
+  save_model_responses: true
+  save_intermediate_steps: true
+  export_formats: ["json", "csv", "parquet"]
+  compression: "gzip"
+  
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file_rotation: "1 day"
+  retention: "30 days"

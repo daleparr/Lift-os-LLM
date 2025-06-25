@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  leaderboard-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: llm-finance-leaderboard
+    ports:
+      - "8501:8501"  # Streamlit
+      - "8000:8000"  # FastAPI (if needed)
+    environment:
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./configs:/app/configs
+    depends_on:
+      - redis
+    networks:
+      - leaderboard-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  redis:
+    image: redis:7-alpine
+    container_name: llm-finance-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - leaderboard-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: llm-finance-worker
+    command: python scripts/benchmark_worker.py
+    environment:
+      - WORKER_MODE=true
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./configs:/app/configs
+    depends_on:
+      - redis
+    networks:
+      - leaderboard-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+volumes:
+  redis_data:
+
+networks:
+  leaderboard-network:
+    driver: bridge
