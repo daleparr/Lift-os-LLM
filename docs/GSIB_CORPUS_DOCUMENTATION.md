@@ -162,6 +162,6 @@ This corpus is designed for educational and model training purposes. All regulat
 ---
 
 **Version**: 3.0  
-**Last Updated**: December 2024  
+**Last Updated**: June 2025
 **Maintained By**: LLM Finance Leaderboard Team  
 **Review Cycle**: Quarterly regulatory updates
