@@ -11,7 +11,11 @@ __email__ = "contact@yourorg.com"
 
 from .config.settings import Settings
 
-# Initialize global settings
-settings = Settings()
+# Initialize global settings only if environment variables are available
+try:
+    settings = Settings()
+except Exception:
+    # Fallback for cloud deployment without environment variables
+    settings = None
 
 __all__ = ["settings", "__version__"]

@@ -16,8 +16,8 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
     
     # API Keys
-    pinecone_api_key: str = Field(..., env="PINECONE_API_KEY")
-    pinecone_environment: str = Field(..., env="PINECONE_ENVIRONMENT")
+    pinecone_api_key: Optional[str] = Field(None, env="PINECONE_API_KEY")
+    pinecone_environment: Optional[str] = Field(None, env="PINECONE_ENVIRONMENT")
     openai_api_key: Optional[str] = Field(None, env="OPENAI_API_KEY")
     anthropic_api_key: Optional[str] = Field(None, env="ANTHROPIC_API_KEY")
     huggingface_api_token: Optional[str] = Field(None, env="HUGGINGFACE_API_TOKEN")
