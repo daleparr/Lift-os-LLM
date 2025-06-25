@@ -22,9 +22,17 @@ class Settings(BaseSettings):
     anthropic_api_key: Optional[str] = Field(None, env="ANTHROPIC_API_KEY")
     huggingface_api_token: Optional[str] = Field(None, env="HUGGINGFACE_API_TOKEN")
     
-    # Financial Data APIs
-    fred_api_key: Optional[str] = Field(None, env="FRED_API_KEY")
-    alpha_vantage_api_key: Optional[str] = Field(None, env="ALPHA_VANTAGE_API_KEY")
+    # Financial Data APIs (Optional - for enhanced evaluation with real market data)
+    fred_api_key: Optional[str] = Field(
+        None,
+        env="FRED_API_KEY",
+        description="Optional: Federal Reserve Economic Data API key for accessing 800,000+ economic indicators (GDP, inflation, unemployment, etc.)"
+    )
+    alpha_vantage_api_key: Optional[str] = Field(
+        None,
+        env="ALPHA_VANTAGE_API_KEY",
+        description="Optional: Alpha Vantage API key for real-time and historical stock market data (prices, earnings, technical indicators)"
+    )
     
     # Database Configuration
     database_url: str = Field("sqlite:///data/leaderboard.db", env="DATABASE_URL")
@@ -46,8 +54,18 @@ class Settings(BaseSettings):
     
     # Logging
     log_level: str = Field("INFO", env="LOG_LEVEL")
-    wandb_project: Optional[str] = Field(None, env="WANDB_PROJECT")
-    wandb_api_key: Optional[str] = Field(None, env="WANDB_API_KEY")
+    
+    # Experiment Tracking (Optional - for ML experiment monitoring)
+    wandb_project: Optional[str] = Field(
+        None,
+        env="WANDB_PROJECT",
+        description="Optional: Weights & Biases project name for tracking training experiments and model performance metrics"
+    )
+    wandb_api_key: Optional[str] = Field(
+        None,
+        env="WANDB_API_KEY",
+        description="Optional: Weights & Biases API key for logging training runs, hyperparameters, and model comparisons"
+    )
     
     # Streamlit Configuration
     streamlit_server_port: int = Field(8501, env="STREAMLIT_SERVER_PORT")
