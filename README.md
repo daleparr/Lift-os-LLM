@@ -344,28 +344,6 @@ runner.register_task("custom_task", CustomFinancialTask())
 - **Documentation**: Complete audit trail and model documentation
 - **Governance**: Model risk management and approval workflows
 
-## 📈 **Roadmap**
-
-### **Q1 2025**
-- [ ] **Real-time Data Integration**: Live market data feeds
-- [ ] **Advanced Risk Models**: Credit risk, market risk, operational risk
-- [ ] **Multi-language Support**: Support for non-English financial documents
-- [ ] **Cloud Deployment**: AWS/GCP/Azure deployment templates
-
-### **Q2 2025**
-- [ ] **Federated Learning**: Multi-institution model training
-- [ ] **Explainable AI**: Model interpretability and explanation
-- [ ] **Advanced Agents**: Multi-step reasoning and tool use
-- [ ] **Performance Optimization**: Model quantization and acceleration
-
-### **Q3 2025**
-- [ ] **Regulatory Reporting**: Automated compliance reporting
-- [ ] **Alternative Data**: Satellite, social media, ESG data integration
-- [ ] **Portfolio Optimization**: Advanced portfolio construction
-- [ ] **Real-time Inference**: Low-latency trading applications
-
-## 📞 **Support**
-
 ### **Documentation**
 - **[Complete Documentation](docs/README.md)** - Full documentation index
 - **[API Reference](docs/DEVELOPER_API_GUIDE.md)** - Detailed API documentation
@@ -375,11 +353,6 @@ runner.register_task("custom_task", CustomFinancialTask())
 - **GitHub Issues**: Bug reports and feature requests
 - **Discussions**: Questions and community support
 - **Wiki**: Community-contributed guides and examples
-
-### **Enterprise Support**
-For enterprise deployments, custom development, or commercial licensing:
-- **Email**: [contact@yourorg.com](mailto:contact@yourorg.com)
-- **LinkedIn**: [Your Organization](https://linkedin.com/company/yourorg)
 
 ## 📄 **License**
 
