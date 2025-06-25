@@ -79,7 +79,8 @@ def main():
         st.header("🔧 Navigation")
         page = st.selectbox(
             "Select Page",
-            ["📊 Model Leaderboard", "🎯 Training Dashboard", "🤖 Agent Analysis", "📚 Documentation"]
+            ["📊 Model Leaderboard", "🎯 Training Dashboard", "🤖 Agent Analysis", "📚 Documentation"],
+            key="main_cloud_navigation_selectbox"
         )
         
         st.markdown("---")
@@ -268,7 +269,8 @@ def show_training_dashboard():
                 "mistralai/Mistral-7B-Instruct-v0.1",
                 "meta-llama/Llama-2-7b-chat-hf",
                 "microsoft/DialoGPT-medium"
-            ]
+            ],
+            key="training_model_selectbox"
         )
         
         dataset = st.selectbox(
@@ -277,7 +279,8 @@ def show_training_dashboard():
                 "G-SIB Banking Corpus (30 samples)",
                 "General Finance (100 samples)",
                 "ESG Analysis (50 samples)"
-            ]
+            ],
+            key="training_dataset_selectbox"
         )
     
     with col2:
