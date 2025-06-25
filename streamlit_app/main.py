@@ -788,8 +788,6 @@ def show_model_selection_ui():
             st.rerun()
 
 
-if __name__ == "__main__":
-    main()
 def show_auto_finetuning():
     """Display the auto fine-tuning interface."""
     st.header("🔧 Auto Fine-tuning")
