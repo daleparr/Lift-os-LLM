@@ -5,9 +5,9 @@
 [![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](https://hub.docker.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **Production-ready microservice for LLM-powered content analysis, optimization, and AI surfacing**
+> **Production-ready microservice for LLM-powered content analysis, optimization, AI surfacing, and model training**
 
-A comprehensive API service that leverages Large Language Models to analyze content, optimize for AI search engines, and provide intelligent recommendations for maximum AI visibility.
+A comprehensive API service that leverages Large Language Models to analyze content, optimize for AI search engines, provide intelligent recommendations for maximum AI visibility, and includes advanced auto fine-tuning capabilities for evaluating baseline models against fine-tuned variants across multiple industries.
 
 ## 🚀 **Quick Start**
 
@@ -49,6 +49,13 @@ python scripts/setup.py  # Automated setup with dependency installation
 - **Meta Tag Enhancement**: SEO and AI-native search optimization
 - **Knowledge Graph Analysis**: Entity relationships and semantic context
 
+### 🎓 **Auto Fine-Tuning & Training**
+- **Multi-Industry Training**: Finance, Education, Retail, Healthcare, Multi-industry datasets
+- **LocalTrainingOrchestrator**: Queue-managed concurrent training jobs
+- **Model Comparison Engine**: Baseline vs fine-tuned performance evaluation
+- **Comprehensive Metrics**: Accuracy, cost, latency, and throughput analysis
+- **Industry-Specific Benchmarks**: Context-aware evaluation across domains
+
 ### 🚀 **Production-Ready API**
 - **FastAPI Framework**: High-performance async API with auto-documentation
 - **JWT Authentication**: Secure token-based authentication
@@ -57,7 +64,7 @@ python scripts/setup.py  # Automated setup with dependency installation
 
 ### 🤖 **Advanced AI Capabilities**
 - **Vector Embeddings**: Semantic similarity and content matching
-- **Batch Processing**: High-throughput content analysis
+- **Batch Processing**: High-throughput content analysis and training
 - **Model Fine-tuning**: Custom model training and optimization
 - **Multi-Agent Workflows**: Sophisticated content processing pipelines
 
@@ -69,8 +76,17 @@ python scripts/setup.py  # Automated setup with dependency installation
 - `POST /api/v1/embeddings` - Vector embeddings and semantic analysis
 - `POST /api/v1/knowledge-graph` - Entity extraction and relationship mapping
 
+### **Training & Evaluation**
+- `POST /api/v1/training/jobs/submit` - Submit fine-tuning jobs for multi-industry datasets
+- `GET /api/v1/training/jobs` - List training jobs with filtering and status
+- `GET /api/v1/training/jobs/{job_id}` - Get detailed training job status and metrics
+- `GET /api/v1/training/datasets` - List available industry-specific training datasets
+- `POST /api/v1/training/evaluate` - Evaluate model performance with comprehensive metrics
+- `POST /api/v1/training/compare` - Compare baseline vs fine-tuned model performance
+
 ### **Batch Operations**
 - `POST /api/v1/batch/analyze` - Bulk content analysis with queue management
+- `POST /api/v1/batch/training` - Bulk training job submission
 - `GET /api/v1/batch/status/{job_id}` - Check batch job status and results
 
 ### **Model Management**
@@ -112,21 +128,22 @@ python scripts/setup.py  # Automated setup with dependency installation
 lift-os-llm/
 ├── 📂 src/
 │   ├── 📂 api/                 # FastAPI routes and endpoints
-│   │   ├── v1/
+│   │   ├── routes/
 │   │   │   ├── analysis.py
-│   │   │   ├── optimization.py
+│   │   │   ├── training.py     # Training and evaluation endpoints
 │   │   │   ├── models.py
 │   │   │   └── batch.py
 │   │   └── middleware/
 │   ├── 📂 services/            # Core business logic
 │   │   ├── content_analysis.py
+│   │   ├── training_service.py # Training orchestration and management
 │   │   ├── llm_orchestrator.py
 │   │   ├── vector_embeddings.py
 │   │   ├── knowledge_graph.py
 │   │   └── optimization_engine.py
 │   ├── 📂 models/              # Data models and schemas
-│   │   ├── requests.py
-│   │   ├── responses.py
+│   │   ├── requests.py         # API request models including training
+│   │   ├── responses.py        # API response models including training
 │   │   └── entities.py
 │   ├── 📂 core/                # Core utilities and config
 │   │   ├── config.py
@@ -237,6 +254,47 @@ response = requests.post(
 
 optimized = response.json()
 print(f"Score Improvement: +{optimized['improvements']['score_increase']} points")
+```
+
+### **Model Training & Evaluation**
+```python
+# Submit a fine-tuning job
+response = requests.post(
+    "http://localhost:8000/api/v1/training/jobs/submit",
+    headers={"Authorization": "Bearer YOUR_JWT_TOKEN"},
+    json={
+        "model_name": "gpt-3.5-turbo",
+        "dataset": "finance",
+        "training_config": {
+            "epochs": 3,
+            "learning_rate": 0.0001,
+            "batch_size": 16
+        },
+        "evaluation_config": {
+            "test_split": 0.2,
+            "metrics": ["accuracy", "cost", "latency"]
+        }
+    }
+)
+
+job = response.json()
+print(f"Training job submitted: {job['job_id']}")
+
+# Compare baseline vs fine-tuned model
+response = requests.post(
+    "http://localhost:8000/api/v1/training/compare",
+    headers={"Authorization": "Bearer YOUR_JWT_TOKEN"},
+    json={
+        "baseline_model": "gpt-3.5-turbo",
+        "fine_tuned_model": "ft:gpt-3.5-turbo:company:model:abc123",
+        "dataset": "finance",
+        "metrics": ["accuracy", "cost", "latency", "throughput"]
+    }
+)
+
+comparison = response.json()
+print(f"Accuracy improvement: +{comparison['improvements']['accuracy']}%")
+print(f"Cost efficiency: {comparison['improvements']['cost']}% reduction")
 ```
 
 ### **Batch Processing**
@@ -384,6 +442,36 @@ pytest
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## 🏭 **Training Datasets & Industries**
+
+### **Available Training Datasets**
+- **🏦 Finance**: G-SIB Banking Corpus (30 samples, high complexity)
+  - Focus: Financial analysis, risk assessment, regulatory compliance
+  - Use cases: Banking AI, financial document analysis, compliance automation
+
+- **🎓 Education**: Educational Analytics (20 samples, medium complexity)
+  - Focus: Learning analytics, educational content optimization
+  - Use cases: EdTech platforms, personalized learning, content recommendation
+
+- **🛒 Retail**: Business Analytics (20 samples, medium complexity)
+  - Focus: Product analysis, customer insights, market intelligence
+  - Use cases: E-commerce optimization, product recommendations, market analysis
+
+- **🏥 Healthcare**: Clinical Analytics (20 samples, medium complexity)
+  - Focus: Clinical data analysis, healthcare optimization
+  - Use cases: Medical AI, clinical decision support, healthcare analytics
+
+- **🌐 Multi-Industry**: Combined Corpus (80 samples, mixed complexity)
+  - Focus: Cross-domain analysis, general business intelligence
+  - Use cases: Universal AI models, multi-domain applications
+
+### **Training Capabilities**
+- **Baseline vs Fine-tuned Comparison**: Comprehensive performance evaluation
+- **Multi-Metric Analysis**: Accuracy, cost, latency, throughput assessment
+- **Industry-Specific Benchmarks**: Context-aware evaluation criteria
+- **Queue-Managed Training**: Concurrent job processing with LocalTrainingOrchestrator
+- **Model Performance Tracking**: Historical performance and improvement analytics
+
 ## 🙏 **Acknowledgments**
 
 - **FastAPI** for the high-performance web framework
@@ -391,6 +479,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **OpenAI & Anthropic** for LLM API access
 - **Pinecone** for vector database capabilities
 - **Previous Lift OS Surfacing** for architectural patterns
+- **Original LLM Finance Leaderboard** for training infrastructure and multi-industry datasets
 
 ---
 
