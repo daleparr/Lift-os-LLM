@@ -304,12 +304,23 @@ class TrainingConfig(BaseModel):
         use_enum_values = True
 
 
+class Industry(str, Enum):
+    """Industry types for training."""
+    FINANCE = "finance"
+    EDUCATION = "education"
+    RETAIL = "retail"
+    HEALTHCARE = "healthcare"
+    ALL = "all"
+
+
 class TrainingJob(BaseModel):
     """Training job status and metadata."""
     job_id: str
     model_name: str
     dataset_name: str
+    industries: List[str] = Field(default_factory=list)  # Selected industries
     status: str  # "pending", "running", "completed", "failed"
+    priority: str = "Normal"  # "Low", "Normal", "High"
     created_at: datetime
     started_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None

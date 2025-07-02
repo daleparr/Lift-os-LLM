@@ -1,12 +1,14 @@
-# Training Configuration for LLM Finance Leaderboard
-# Enhanced with G-SIB Banking Corpus
+# Training Configuration for LLM Multi-Industry Leaderboard
+# Enhanced with Finance, Education, Retail, and Healthcare Corpus
 
-# Dataset Configuration
+# Dataset Configuration by Industry
 datasets:
+  # Finance Industry
   basic_finance:
     path: "data/training/synthetic_finance_v2.jsonl"
     type: "instruction_following"
     domain: "general_finance"
+    industry: "finance"
     complexity: "low_medium"
     samples: 20
     weight: 0.4
@@ -15,17 +17,91 @@ datasets:
     path: "data/training/synthetic_finance_gsib_v3.jsonl"
     type: "instruction_following"
     domain: "gsib_banking"
+    industry: "finance"
     complexity: "high"
     samples: 30
     weight: 0.6
     
-  combined_corpus:
+  combined_finance:
     path: "data/training/combined_finance_corpus.jsonl"
     type: "instruction_following"
     domain: "comprehensive_finance"
+    industry: "finance"
     complexity: "mixed"
     samples: 50
     weight: 1.0
+    
+  # Education Industry
+  education_analytics:
+    path: "data/training/synthetic_education_v1.jsonl"
+    type: "instruction_following"
+    domain: "education_analytics"
+    industry: "education"
+    complexity: "medium"
+    samples: 20
+    weight: 1.0
+    
+  # Retail Industry
+  retail_analytics:
+    path: "data/training/synthetic_retail_v1.jsonl"
+    type: "instruction_following"
+    domain: "retail_analytics"
+    industry: "retail"
+    complexity: "medium"
+    samples: 20
+    weight: 1.0
+    
+  # Healthcare Industry
+  healthcare_analytics:
+    path: "data/training/synthetic_healthcare_v1.jsonl"
+    type: "instruction_following"
+    domain: "healthcare_analytics"
+    industry: "healthcare"
+    complexity: "medium"
+    samples: 20
+    weight: 1.0
+    
+  # Multi-Industry Combined
+  multi_industry_combined:
+    path: "data/training/combined_multi_industry_corpus.jsonl"
+    type: "instruction_following"
+    domain: "multi_industry"
+    industry: "all"
+    complexity: "mixed"
+    samples: 80
+    weight: 1.0
+
+# Industry-Specific Configuration
+industries:
+  finance:
+    name: "Financial Services"
+    description: "Banking, investment, regulatory compliance, and financial analysis"
+    datasets: ["basic_finance", "gsib_banking", "combined_finance"]
+    evaluation_metrics: ["financial_accuracy", "regulatory_compliance", "calculation_accuracy"]
+    
+  education:
+    name: "Education"
+    description: "Educational analytics, student performance, and institutional metrics"
+    datasets: ["education_analytics"]
+    evaluation_metrics: ["educational_accuracy", "statistical_analysis", "policy_compliance"]
+    
+  retail:
+    name: "Retail & E-commerce"
+    description: "Retail analytics, customer metrics, and business performance"
+    datasets: ["retail_analytics"]
+    evaluation_metrics: ["retail_accuracy", "business_metrics", "customer_analysis"]
+    
+  healthcare:
+    name: "Healthcare"
+    description: "Healthcare analytics, patient outcomes, and clinical metrics"
+    datasets: ["healthcare_analytics"]
+    evaluation_metrics: ["clinical_accuracy", "patient_safety", "quality_metrics"]
+    
+  all:
+    name: "Multi-Industry"
+    description: "Combined training across all industry domains"
+    datasets: ["multi_industry_combined"]
+    evaluation_metrics: ["cross_domain_accuracy", "general_analytics", "domain_adaptation"]
 
 # Training Parameters
 training:
@@ -77,31 +153,112 @@ evaluation:
   # Validation Split
   validation_split: 0.2
   
-  # Metrics
-  metrics:
+  # General Metrics (applicable to all industries)
+  general_metrics:
     - "exact_match"
     - "rouge_l"
     - "bleu"
-    - "financial_accuracy"
-    - "regulatory_compliance"
+    - "semantic_similarity"
     
-  # Domain-Specific Evaluation
+  # Industry-Specific Metrics
+  industry_metrics:
+    finance:
+      - "financial_accuracy"
+      - "regulatory_compliance"
+      - "calculation_accuracy"
+      - "risk_assessment_quality"
+      
+    education:
+      - "educational_accuracy"
+      - "statistical_analysis"
+      - "policy_compliance"
+      - "student_outcome_prediction"
+      
+    retail:
+      - "retail_accuracy"
+      - "business_metrics"
+      - "customer_analysis"
+      - "inventory_optimization"
+      
+    healthcare:
+      - "clinical_accuracy"
+      - "patient_safety"
+      - "quality_metrics"
+      - "outcome_prediction"
+  
+  # Domain-Specific Evaluation Weights
   domain_metrics:
-    calculation_accuracy:
-      weight: 0.3
-      tolerance: 0.01  # 1% tolerance for numerical calculations
-      
-    regulatory_knowledge:
-      weight: 0.25
-      categories: ["basel_iii", "liquidity", "capital", "risk_management"]
-      
-    explanation_quality:
-      weight: 0.25
-      criteria: ["clarity", "completeness", "accuracy"]
-      
-    practical_application:
-      weight: 0.2
-      scenarios: ["compliance_assessment", "risk_analysis", "capital_planning"]
+    # Finance Domain
+    finance:
+      calculation_accuracy:
+        weight: 0.3
+        tolerance: 0.01  # 1% tolerance for numerical calculations
+        
+      regulatory_knowledge:
+        weight: 0.25
+        categories: ["basel_iii", "liquidity", "capital", "risk_management"]
+        
+      explanation_quality:
+        weight: 0.25
+        criteria: ["clarity", "completeness", "accuracy"]
+        
+      practical_application:
+        weight: 0.2
+        scenarios: ["compliance_assessment", "risk_analysis", "capital_planning"]
+    
+    # Education Domain
+    education:
+      statistical_accuracy:
+        weight: 0.35
+        tolerance: 0.02  # 2% tolerance for educational statistics
+        
+      policy_knowledge:
+        weight: 0.25
+        categories: ["student_performance", "resource_allocation", "compliance"]
+        
+      interpretation_quality:
+        weight: 0.25
+        criteria: ["clarity", "actionability", "evidence_based"]
+        
+      practical_application:
+        weight: 0.15
+        scenarios: ["performance_analysis", "resource_planning", "policy_assessment"]
+    
+    # Retail Domain
+    retail:
+      business_calculation_accuracy:
+        weight: 0.35
+        tolerance: 0.01  # 1% tolerance for business calculations
+        
+      market_knowledge:
+        weight: 0.25
+        categories: ["customer_behavior", "inventory_management", "pricing"]
+        
+      insight_quality:
+        weight: 0.25
+        criteria: ["actionability", "data_driven", "business_relevance"]
+        
+      practical_application:
+        weight: 0.15
+        scenarios: ["sales_analysis", "inventory_optimization", "customer_segmentation"]
+    
+    # Healthcare Domain
+    healthcare:
+      clinical_calculation_accuracy:
+        weight: 0.4
+        tolerance: 0.005  # 0.5% tolerance for clinical calculations
+        
+      medical_knowledge:
+        weight: 0.3
+        categories: ["patient_safety", "quality_metrics", "clinical_outcomes"]
+        
+      interpretation_quality:
+        weight: 0.2
+        criteria: ["clinical_relevance", "safety_focus", "evidence_based"]
+        
+      practical_application:
+        weight: 0.1
+        scenarios: ["outcome_analysis", "quality_improvement", "safety_assessment"]
 
 # Hardware Requirements
 hardware:

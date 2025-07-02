@@ -78,6 +78,8 @@ class LocalTrainingOrchestrator:
         model_name: str,
         dataset_path: str,
         output_dir: Optional[str] = None,
+        industries: Optional[List[str]] = None,
+        priority: str = "Normal",
         **kwargs
     ) -> str:
         """Submit a new training job."""
@@ -105,6 +107,8 @@ class LocalTrainingOrchestrator:
             job_id=job_id,
             model_name=model_name,
             dataset_name=os.path.basename(dataset_path),
+            industries=industries or [],
+            priority=priority,
             status="pending",
             created_at=datetime.now()
         )

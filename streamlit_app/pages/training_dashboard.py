@@ -80,7 +80,62 @@ def render_submit_job_page():
     
     st.header("🚀 Submit Fine-tuning Job")
     
+    # Industry Selection
+    st.subheader("🏭 Industry Selection")
+    
+    # Load industry configuration
+    industries = {
+        "finance": {
+            "name": "Financial Services",
+            "description": "Banking, investment, regulatory compliance, and financial analysis",
+            "icon": "💰"
+        },
+        "education": {
+            "name": "Education",
+            "description": "Educational analytics, student performance, and institutional metrics",
+            "icon": "🎓"
+        },
+        "retail": {
+            "name": "Retail & E-commerce",
+            "description": "Retail analytics, customer metrics, and business performance",
+            "icon": "🛒"
+        },
+        "healthcare": {
+            "name": "Healthcare",
+            "description": "Healthcare analytics, patient outcomes, and clinical metrics",
+            "icon": "🏥"
+        },
+        "all": {
+            "name": "Multi-Industry",
+            "description": "Combined training across all industry domains",
+            "icon": "🌐"
+        }
+    }
+    
+    # Industry selection with visual cards
+    selected_industries = []
+    
+    cols = st.columns(len(industries))
+    for i, (industry_key, industry_info) in enumerate(industries.items()):
+        with cols[i]:
+            if st.checkbox(
+                f"{industry_info['icon']} {industry_info['name']}",
+                key=f"industry_{industry_key}",
+                help=industry_info['description']
+            ):
+                selected_industries.append(industry_key)
+    
+    if not selected_industries:
+        st.warning("Please select at least one industry for fine-tuning.")
+        return
+    
+    # Show selected industries summary
+    if selected_industries:
+        st.info(f"Selected Industries: {', '.join([industries[ind]['name'] for ind in selected_industries])}")
+    
     # Model selector component
+    st.markdown("---")
+    st.subheader("🤖 Model Configuration")
     model_selector = ModelSelector()
     config = model_selector.render()
     
@@ -97,7 +152,7 @@ def render_submit_job_page():
     with col1:
         job_name = st.text_input(
             "Job Name (Optional)",
-            placeholder="e.g., Mistral-7B-Finance-v1"
+            placeholder=f"e.g., Mistral-7B-{'-'.join(selected_industries).title()}-v1"
         )
         
         priority = st.selectbox(
@@ -119,21 +174,114 @@ def render_submit_job_page():
             help="Save comparison results for future reference"
         )
     
+    # Dataset information
+    st.markdown("---")
+    st.subheader("📊 Dataset Information")
+    
+    dataset_info = get_dataset_info_for_industries(selected_industries)
+    
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Total Samples", dataset_info["total_samples"])
+    with col2:
+        st.metric("Industries", len(selected_industries))
+    with col3:
+        st.metric("Estimated Training Time", f"{dataset_info['estimated_hours']:.1f}h")
+    
+    # Show dataset breakdown
+    with st.expander("📋 Dataset Breakdown"):
+        for industry in selected_industries:
+            industry_data = dataset_info["industries"][industry]
+            st.markdown(f"**{industries[industry]['icon']} {industries[industry]['name']}**")
+            st.markdown(f"- Samples: {industry_data['samples']}")
+            st.markdown(f"- Dataset: `{industry_data['dataset_path']}`")
+            st.markdown(f"- Complexity: {industry_data['complexity']}")
+            st.markdown("")
+    
     # Submit button
     if st.button("🚀 Start Fine-tuning", type="primary", use_container_width=True):
         if config.get("finetune_enabled", False):
-            submit_training_job(config, job_name, priority, auto_evaluate, save_comparison)
+            submit_training_job(config, selected_industries, job_name, priority, auto_evaluate, save_comparison)
         else:
             st.error("Fine-tuning is not enabled. Please select 'Also Fine-tune and Compare' option.")
 
 
-def submit_training_job(config: Dict, job_name: str, priority: str, auto_evaluate: bool, save_comparison: bool):
+def get_dataset_info_for_industries(selected_industries: List[str]) -> Dict:
+    """Get dataset information for selected industries."""
+    
+    # Dataset mapping
+    industry_datasets = {
+        "finance": {
+            "dataset_path": "data/training/synthetic_finance_gsib_v3.jsonl",
+            "samples": 30,
+            "complexity": "high"
+        },
+        "education": {
+            "dataset_path": "data/training/synthetic_education_v1.jsonl",
+            "samples": 20,
+            "complexity": "medium"
+        },
+        "retail": {
+            "dataset_path": "data/training/synthetic_retail_v1.jsonl",
+            "samples": 20,
+            "complexity": "medium"
+        },
+        "healthcare": {
+            "dataset_path": "data/training/synthetic_healthcare_v1.jsonl",
+            "samples": 20,
+            "complexity": "medium"
+        },
+        "all": {
+            "dataset_path": "data/training/combined_multi_industry_corpus.jsonl",
+            "samples": 80,
+            "complexity": "mixed"
+        }
+    }
+    
+    total_samples = 0
+    industries_info = {}
+    
+    for industry in selected_industries:
+        if industry in industry_datasets:
+            info = industry_datasets[industry]
+            industries_info[industry] = info
+            total_samples += info["samples"]
+    
+    # Estimate training time (rough calculation)
+    estimated_hours = total_samples * 0.1  # ~6 minutes per sample
+    
+    return {
+        "total_samples": total_samples,
+        "estimated_hours": estimated_hours,
+        "industries": industries_info
+    }
+
+
+def get_dataset_path_for_industries(selected_industries: List[str]) -> str:
+    """Get the appropriate dataset path for selected industries."""
+    
+    # If multiple industries or "all" is selected, use combined corpus
+    if len(selected_industries) > 1 or "all" in selected_industries:
+        return "data/training/combined_multi_industry_corpus.jsonl"
+    
+    # Single industry selection
+    industry_paths = {
+        "finance": "data/training/synthetic_finance_gsib_v3.jsonl",
+        "education": "data/training/synthetic_education_v1.jsonl",
+        "retail": "data/training/synthetic_retail_v1.jsonl",
+        "healthcare": "data/training/synthetic_healthcare_v1.jsonl"
+    }
+    
+    industry = selected_industries[0]
+    return industry_paths.get(industry, "data/training/combined_multi_industry_corpus.jsonl")
+
+
+def submit_training_job(config: Dict, selected_industries: List[str], job_name: str, priority: str, auto_evaluate: bool, save_comparison: bool):
     """Submit a training job."""
     
     try:
-        # Get dataset path
-        dataset_config = config.get("dataset_config", {})
-        dataset_path = dataset_config.get("path", "data/training/synthetic_finance_v2.jsonl")
+        # Determine dataset path based on selected industries
+        dataset_path = get_dataset_path_for_industries(selected_industries)
         
         # Check if dataset exists
         import os
@@ -149,7 +297,10 @@ def submit_training_job(config: Dict, job_name: str, priority: str, auto_evaluat
             dataset_path=dataset_path,
             output_dir=None,  # Auto-generated
             # Additional config from training estimates
-            **config.get("training_estimates", {})
+            **config.get("training_estimates", {}),
+            # Industry-specific metadata
+            industries=selected_industries,
+            priority=priority
         )
         
         st.success(f"✅ Training job submitted successfully!")
@@ -159,9 +310,12 @@ def submit_training_job(config: Dict, job_name: str, priority: str, auto_evaluat
         if 'submitted_jobs' not in st.session_state:
             st.session_state.submitted_jobs = {}
         
+        industries_display = ", ".join(selected_industries).title()
         st.session_state.submitted_jobs[job_id] = {
             "name": job_name or f"Job-{job_id[:8]}",
-            "model": config["base_model_display"],
+            "model": config.get("base_model_display", config["base_model"]),
+            "industries": selected_industries,
+            "industries_display": industries_display,
             "priority": priority,
             "auto_evaluate": auto_evaluate,
             "save_comparison": save_comparison,
@@ -258,11 +412,15 @@ def render_job_card(job):
         col1, col2 = st.columns(2)
         
         with col1:
+            industries_display = ", ".join(job.industries).title() if hasattr(job, 'industries') and job.industries else "Finance"
+            priority_display = getattr(job, 'priority', 'Normal')
             st.markdown(f"""
             **Job ID:** `{job.job_id}`
             **Model:** {job.model_name}
             **Dataset:** {job.dataset_name}
+            **Industries:** {industries_display}
             **Status:** {job.status.title()}
+            **Priority:** {priority_display}
             """)
         
         with col2:
